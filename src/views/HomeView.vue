@@ -2,7 +2,7 @@
 import { ref } from 'vue'
 import ProductCard from '../components/Product/ProductCard.vue'
 import CheckBox from '../components/Form/CheckBox.vue'
-import { useProductStore } from '../stores/ProductStore';
+import { useProductStore } from '../stores/ProductStore'
 const showCategorySubMenus = ref(false)
 const showBrandsSubMenus = ref(false)
 
@@ -165,7 +165,7 @@ const productStore = useProductStore()
       <div class="w-full md:w-4/5">
         <div class="grid grid-cols-1 justify-items-center md:grid-cols-2 md:gap-10 lg:grid-cols-3">
           <div v-for="product in productStore.products" v-bind:key="product.id">
-            <ProductCard :product="product"/>
+            <ProductCard :product="product" />
           </div>
         </div>
       </div>

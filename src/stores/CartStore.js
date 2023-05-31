@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
+import { useProductStore } from './ProductStore'
 
 /**
  * Using the Options API
@@ -28,14 +29,25 @@ import { ref } from 'vue'
 export const useCartStore = defineStore('cartStore', () => {
   const products = ref([])
   const totalAmount = ref(0)
+  const totalNumberOfCartItems = ref(0)
 
   function add(product) {
-    products.value.push({ product })
+    const productStore = useProductStore()
+
+    const existingProductInStore = products.value.filter((p) => p.id === product.id)
+
+    if (existingProductInStore.length > 0) {
+      return
+    } else {
+      products.value.push(product)
+      productStore.decreaseProductQuantity(product.id, product.quantity)
+      totalNumberOfCartItems.value++
+    }
   }
 
   function remove(product) {
     products.value.pop(product.id)
   }
 
-  return { totalAmount, products, add, remove }
+  return { totalAmount, products, totalNumberOfCartItems, add, remove }
 })

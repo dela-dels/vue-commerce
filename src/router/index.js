@@ -17,8 +17,9 @@ const router = createRouter({
       component: BrandsView
     },
     {
-      path: '/product',
+      path: '/product/:id',
       name: 'Product',
+      props: true,
       component: ProductView
     }
     // {

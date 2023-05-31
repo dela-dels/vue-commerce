@@ -1,8 +1,18 @@
 <script setup>
-import { ref } from 'vue'
-import ProductSizeRadioButton from '../components/Product/ProductSizeRadioButton.vue'
+import { ref, computed } from 'vue'
+import { useCartStore } from '../stores/CartStore'
+import { defineProps } from 'vue'
+import { useProductStore } from '../stores/ProductStore'
+
+const props = defineProps({
+  id: String
+})
 
 const quantity = ref(1)
+const selectedSize = ref("")
+
+const cartStore = useCartStore()
+const productStore = useProductStore()
 
 function incrementQuantity() {
   quantity.value++
@@ -14,10 +24,26 @@ function decrementQuantity() {
   }
   quantity.value--
 }
+
+function addItemToCart(productUUID) {
+  const product = productStore.products.find((product) => product.id === productUUID)
+
+  cartStore.add({
+    id: product.id,
+    name: product.name,
+    quantity: quantity.value,
+    size: selectedSize.value,
+    price: product.price
+  })
+}
+
+const productDetails = computed(() => {
+  return productStore.products.find((product) => product.id === props.id)
+})
 </script>
 <template>
-  <main class="mx-40 mb-40">
-    <div class="flex items-center space-x-1">
+  <main class="container flex flex-col px-20 mb-40">
+    <div class="flex flex-row items-center justify-center md:space-x-2 md:justify-start">
       <span class="text-gray-400">Browse Products</span>
       <svg
         xmlns="http://www.w3.org/2000/svg"
@@ -43,19 +69,52 @@ function decrementQuantity() {
       <span class="font-bold">Shirts</span>
     </div>
 
-    <div class="flex mt-10 space-x-8">
-      <div class="md:w-1/2">
-        <div class="h-[38rem]">
+    <div class="grid mt-10 md:mx-5 md:gap-8 grid-col-1 md:grid-cols-2">
+      <div class="grid-cols-1 h-[28rem] md:h-[30rem]">
+        <div class="h-full">
           <img
             src="../assets/images/products/man-shirt.jpg"
             alt=""
             class="object-cover w-full h-full rounded-lg"
           />
         </div>
+
+        <!--Smaller Product Image Cards-->
+        <div class="hidden mt-4 lg:flex lg:justify-evenly">
+          <div class="w-32 h-32 rounded-lg">
+            <img
+              src="../assets/images/products/man-shirt.jpg"
+              class="object-cover w-full h-full rounded-lg"
+              alt=""
+            />
+          </div>
+          <div class="w-32 h-32 rounded-lg">
+            <img
+              src="../assets/images/products/man-shirt.jpg"
+              class="object-cover w-full h-full rounded-lg"
+              alt=""
+            />
+          </div>
+          <div class="w-32 h-32 rounded-lg">
+            <img
+              src="../assets/images/products/man-shirt.jpg"
+              class="object-cover w-full h-full rounded-lg"
+              alt=""
+            />
+          </div>
+          <div class="w-32 h-32 rounded-lg">
+            <img
+              src="../assets/images/products/man-shirt.jpg"
+              class="object-cover w-full h-full rounded-lg"
+              alt=""
+            />
+          </div>
+        </div>
       </div>
-      <div class="md:w-1/2">
+
+      <div class="w-full grid-cols-1 mt-5 md:mt-0">
         <div>
-          <h4 class="text-3xl font-bold">Black-Gray Shirt Loose</h4>
+          <h4 class="text-3xl font-bold">{{ productDetails.name }}</h4>
         </div>
 
         <!--Rating Stars-->
@@ -123,24 +182,45 @@ function decrementQuantity() {
 
         <!--Price-->
         <div class="mt-4">
-          <p class="text-3xl font-semibold">$85.00</p>
+          <p class="text-3xl font-semibold">${{ productDetails.price }}</p>
         </div>
 
         <!--Available Sizes-->
-        <div class="mt-24">
+        <div class="mt-10 md:mt-14 lg:mt-24">
           <div>
-            <h4 class="font-semibold">Available Sizes</h4>
+            <label class="font-bold" for="sizes">Available Sizes</label>
           </div>
-          <div class="flex mt-4 space-x-4">
-            <ProductSizeRadioButton label="S" id="small-size" />
-            <ProductSizeRadioButton label="M" id="medium-size" />
-            <ProductSizeRadioButton label="L" id="large-size" />
-          </div>
+          <ul class="flex mt-8 space-x-4">
+            <li v-for="size in productDetails.sizes" v-bind:key="size">
+              <input
+                class="sr-only peer"
+                type="radio"
+                :value="size.size"
+                name="size"
+                :id="size.size"
+                v-model="selectedSize"
+              />
+              <label
+                class="px-5 py-3 text-sm border border-gray-300 rounded-lg cursor-pointer peer-checked:bg-black peer-checked:text-white peer-checked:border-0 hover:bg-black hover:text-white"
+                :for="size.size"
+              >
+                {{ size.label }}</label
+              >
+            </li>
+          </ul>
+        </div>
+
+        <!--Quantity Left-->
+        <div class="mt-8">
+          <p class="text-lg font-semibold">Pieces Available</p>
+          <p class="text-lg">{{ productDetails.quantity }} left</p>
         </div>
 
         <!--Add To Cart-->
-        <div class="flex mt-10 space-x-4">
-          <div class="flex items-center space-x-4 border border-gray-300 rounded-lg">
+        <div class="flex w-full mt-10 space-x-4">
+          <div
+            class="flex items-center w-32 space-x-4 border border-gray-300 rounded-lg justify-evenly"
+          >
             <button class="px-2" @click="decrementQuantity">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -168,7 +248,12 @@ function decrementQuantity() {
             </button>
           </div>
           <div>
-            <button class="px-4 py-3 text-white bg-black rounded-lg">Add To Cart</button>
+            <button
+              @click="addItemToCart(productDetails.id)"
+              class="px-4 py-3 text-white bg-black rounded-lg hover:bg-gray-900 active:bg-gray-900"
+            >
+              Add To Cart
+            </button>
           </div>
         </div>
       </div>

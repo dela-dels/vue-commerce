@@ -2,8 +2,11 @@
 import { ref } from 'vue'
 import ProductCard from '../components/Product/ProductCard.vue'
 import CheckBox from '../components/Form/CheckBox.vue'
+import { useProductStore } from '../stores/ProductStore';
 const showCategorySubMenus = ref(false)
 const showBrandsSubMenus = ref(false)
+
+const productStore = useProductStore()
 </script>
 
 <template>
@@ -12,7 +15,7 @@ const showBrandsSubMenus = ref(false)
       <span class="font-semibold text-gray-400">Home > </span>
       <span class="font-semibold">Browse Products</span>
     </div>
-    <div class="flex mt-2 space-x-10">
+    <div class="flex mt-2 lg:space-x-10">
       <div
         class="hidden mt-6 p-4 border border-gray-200 divide-y rounded-md h-[35rem] lg:block md:w-1/5"
       >
@@ -160,17 +163,10 @@ const showBrandsSubMenus = ref(false)
         </div>
       </div>
       <div class="w-full md:w-4/5">
-        <div class="grid grid-cols-2 justify-items-center md:grid-cols-3">
-          <ProductCard />
-          <ProductCard />
-          <ProductCard />
-          <ProductCard />
-          <ProductCard />
-          <ProductCard />
-          <ProductCard />
-          <ProductCard />
-          <ProductCard />
-          <ProductCard />
+        <div class="grid grid-cols-1 justify-items-center md:grid-cols-2 md:gap-10 lg:grid-cols-3">
+          <div v-for="product in productStore.products" v-bind:key="product.id">
+            <ProductCard :product="product"/>
+          </div>
         </div>
       </div>
     </div>

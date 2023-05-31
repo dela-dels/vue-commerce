@@ -1,6 +1,12 @@
-<script setup></script>
+<script setup>
+import { defineProps } from 'vue'
+
+defineProps({
+  product: {}
+})
+</script>
 <template>
-  <RouterLink to="/product" class="">
+  <RouterLink :to="{ name: 'Product', params: { id: product.id } }" class="">
     <div class="flex flex-col my-6 rounded-lg cursor-pointer w-72 h-80">
       <div class="w-full h-60">
         <img
@@ -11,11 +17,11 @@
       </div>
       <div class="h-20 p-2 mt-2">
         <div class="flex justify-between">
-          <p>Autumn Shirts</p>
-          <p class="text-xl font-bold">$85</p>
+          <p class="font-semibold">{{ product.name }}</p>
+          <p class="text-xl font-bold">${{ product.price }}</p>
         </div>
         <div class="mt-2">
-          <p class="text-gray-400">4 Variants</p>
+          <p class="text-gray-400">{{ product.numberOfVariants }} Variants</p>
         </div>
       </div>
     </div>
